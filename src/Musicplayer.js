@@ -8,7 +8,6 @@ const Musicplayer = () => {
     </View>
   );
 
-  
 };
 const styles = StyleSheet.create({
   container: {
