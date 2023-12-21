@@ -1,20 +1,21 @@
-export const songs = [
+const songs = [
   {
     id: 1,
     name: 'xxx',
-    image: require('../data/song.png'),
+    image: require('../data/song.jpeg'),
     artist: 'asdasd',
   },
   {
-    id: 1,
+    id: 2,
     name: 'xxx',
-    image: require('../data/song.png'),
+    image: require('../data/song.jpeg'),
     artist: 'asdasd',
   },
   {
-    id: 1,
+    id: 3,
     name: 'xxx',
-    image: require('../data/song.png'),
+    image: require('../data/song.jpeg'),
     artist: 'asdasd',
   },
 ];
+ export default songs
