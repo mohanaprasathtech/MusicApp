@@ -1,5 +1,7 @@
 package com.firsttask;
 
+import com.oblador.vectoricons.VectorIconsPackage;
+
 import android.app.Application;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
@@ -25,6 +27,7 @@ public class MainApplication extends Application implements ReactApplication {
           List<ReactPackage> packages = new PackageList(this).getPackages();
           // Packages that cannot be autolinked yet can be added manually here, for example:
           // packages.add(new MyReactNativePackage());
+          new VectorIconsPackage();
           return packages;
         }
 
