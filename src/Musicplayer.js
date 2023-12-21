@@ -7,6 +7,7 @@ const Musicplayer = () => {
       <Text>Musicplayer</Text>
     </View>
   );
+
   
 };
 const styles = StyleSheet.create({
