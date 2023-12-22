@@ -6,7 +6,6 @@ import {
   Dimensions,
   TouchableOpacity,
   Image,
-  Alert,
   FlatList,
   Animated,
 } from 'react-native';
@@ -16,19 +15,64 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Slider from '@react-native-community/slider';
 import songs from '../data/data';
+import TrackPlayer, {
+  useProgress,
+  Capability,
+  Event,
+  RepeatMode,
+  State,
+  usePlaybackState,
+  useTrackPlayerEvents,
+} from 'react-native-track-player';
+import {addTrack, setupPlayer} from '../service'
 
 const {width, height} = Dimensions.get('window');
 
+// const setupPlayer = async () => {
+//   issetup=false;
+ 
+//   try {
+//     await TrackPlayer.getActiveTrackIndex()
+//   } catch (error) {
+//     await TrackPlayer.setupPlayer();
+//   }finally{
+//     return issetup
+//   } await TrackPlayer.add(songs);
+  
+// };
+
+// const togglePause = async playingstate => {
+//   const currentstate = await TrackPlayer.getActiveTrack();
+//   if (currentstate !== null) {
+//     if (playingstate == State.Paused) {
+//       await TrackPlayer.play();
+//     } else {
+//       await TrackPlayer.pause();
+//     }
+//   }
+// };
+
 const Musicplayer = () => {
+   const[isplayer,setisplayer]=useState(false)
+  const playingstate = usePlaybackState();
   const [songIndex, setsongIndex] = useState(0);
   const ScrollX = useRef(new Animated.Value(0)).current;
   const songslider = useRef(null);
+   
+  const issetup=async()=>{
+    console.log('starting')
+    let setup= await setupPlayer();
+
+    if (setup) {
+      await addTrack();
+    }
+    setisplayer(setup)
+  }
 
   useEffect(() => {
+    // setupPlayer();
+    issetup()
     ScrollX.addListener(({value}) => {
-      // console.log(value,"values");
-      // console.log(width,"Dwid");
-      // console.log(ScrollX,"SX");
       let indexvalue = Math.round(value / width);
       setsongIndex(indexvalue);
     });
@@ -135,7 +179,12 @@ const Musicplayer = () => {
             />
           </TouchableOpacity>
           <TouchableOpacity>
-            <Ionicons name="pause-circle-outline" size={60} color="#FFD369" />
+            <Ionicons
+              // name={playingstate ? 'pause-circle-outline' : 'playcircleo'}
+              name='play-outline'
+              size={60}
+              color="#FFD369"
+            />
           </TouchableOpacity>
           <TouchableOpacity onPress={skipNext}>
             <Ionicons
