@@ -24,13 +24,13 @@ import TrackPlayer, {
   usePlaybackState,
   useTrackPlayerEvents,
 } from 'react-native-track-player';
-import {addTrack, setupPlayer} from '../service'
+import {addTrack, setupPlayer} from '../service';
 
 const {width, height} = Dimensions.get('window');
 
 // const setupPlayer = async () => {
 //   issetup=false;
- 
+
 //   try {
 //     await TrackPlayer.getActiveTrackIndex()
 //   } catch (error) {
@@ -38,7 +38,7 @@ const {width, height} = Dimensions.get('window');
 //   }finally{
 //     return issetup
 //   } await TrackPlayer.add(songs);
-  
+
 // };
 
 // const togglePause = async playingstate => {
@@ -53,25 +53,56 @@ const {width, height} = Dimensions.get('window');
 // };
 
 const Musicplayer = () => {
-   const[isplayer,setisplayer]=useState(false)
-  const playingstate = usePlaybackState();
+  const [isplayer, setisplayer] = useState(false);
+  const [iconName, setIconName] = useState('play-circle');
+  // const playingstate = usePlaybackState();
+  const playbackState = usePlaybackState();
   const [songIndex, setsongIndex] = useState(0);
   const ScrollX = useRef(new Animated.Value(0)).current;
   const songslider = useRef(null);
-   
-  const issetup=async()=>{
-    console.log('starting')
+
+  const issetup = async () => {
+    console.log('starting');
     let setup= await setupPlayer();
 
     if (setup) {
       await addTrack();
     }
     setisplayer(setup)
+    // try {
+    //   await TrackPlayer.setupPlayer();
+    //   await TrackPlayer.reset();
+    // } catch (error) {
+    //   console.log(error,"crashed")
+    // }
+  
+
+    // await TrackPlayer.add(songs);
+  };
+
+  async function togglePlayback() {
+    const currentTrack = await TrackPlayer.getActiveTrackIndex();
+    // console.log(TrackPlayer.getActiveTrackIndex(),"TrackPlayer.getActiveTrackIndex()")
+    console.log(currentTrack, 'currentTrack check');
+    console.log(TrackPlayer,'all details')
+    if (currentTrack == null) {
+      await setup();
+    } else {
+      console.log(playbackState.state,"hello");
+      console.log(State.Playing,"checking sts");
+
+      if (playbackState.state === State.Playing) {
+        await TrackPlayer.pause();
+        setIconName('play-circle');
+      } else {
+        await TrackPlayer.play();
+        setIconName('pause-circle');
+      }
+    }
   }
 
   useEffect(() => {
-    // setupPlayer();
-    issetup()
+    issetup();
     ScrollX.addListener(({value}) => {
       let indexvalue = Math.round(value / width);
       setsongIndex(indexvalue);
@@ -178,12 +209,14 @@ const Musicplayer = () => {
               style={{marginTop: 10}}
             />
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => togglePlayback()}>
             <Ionicons
               // name={playingstate ? 'pause-circle-outline' : 'playcircleo'}
-              name='play-outline'
+              // name='play-outline'
+              name={iconName}
               size={60}
               color="#FFD369"
+              // pressEvent={togglePlayback}
             />
           </TouchableOpacity>
           <TouchableOpacity onPress={skipNext}>

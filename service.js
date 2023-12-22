@@ -42,5 +42,7 @@ export async function playbackService() {
     TrackPlayer.addEventListener(Event.RemoteStop, () => {
       TrackPlayer.destroy();
     });
-  } catch (error) {}
+  } catch (error) {
+    console.log(error,"something failed")
+  }
 }
