@@ -8,8 +8,9 @@ import {
   Image,
   Alert,
   FlatList,
+  Animated,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -19,9 +20,37 @@ import songs from '../data/data';
 const {width, height} = Dimensions.get('window');
 
 const Musicplayer = () => {
+  const [songIndex, setsongIndex] = useState(0);
+  const ScrollX = useRef(new Animated.Value(0)).current;
+  const songslider = useRef(null);
+
+  useEffect(() => {
+    ScrollX.addListener(({value}) => {
+      // console.log(value,"values");
+      // console.log(width,"Dwid");
+      // console.log(ScrollX,"SX");
+      let indexvalue = Math.round(value / width);
+      setsongIndex(indexvalue);
+    });
+
+    return () => {
+      ScrollX.removeAllListeners();
+    };
+  }, []);
+
+  const skipNext = () => {
+    songslider.current.scrollToOffset({
+      offset: (songIndex + 1) * width,
+    });
+  };
+  const skipBack = () => {
+    songslider.current.scrollToOffset({
+      offset: (songIndex - 1) * width,
+    });
+  };
   const SongList = (item, index) => {
     return (
-      <View
+      <Animated.View
         style={{
           justifyContent: 'center',
           alignItems: 'center',
@@ -30,25 +59,38 @@ const Musicplayer = () => {
         <View style={styles.imageContainer}>
           <Image source={item.image} style={styles.image} />
         </View>
-      </View>
+      </Animated.View>
     );
   };
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.maincontainer}>
-        <FlatList
-          data={songs}
-          renderItem={({item, index}) => SongList(item, index)}
-          keyExtractor={item => item.id}
-          showsHorizontalScrollIndicator={false}
-          pagingEnabled
-          horizontal
-          scrollEventThrottle={16}
-        />
+        <View style={{width: width}}>
+          <Animated.FlatList
+            ref={songslider}
+            data={songs}
+            renderItem={({item, index}) => SongList(item, index)}
+            keyExtractor={item => item.id}
+            showsHorizontalScrollIndicator={false}
+            pagingEnabled
+            horizontal
+            scrollEventThrottle={16}
+            onScroll={Animated.event(
+              [
+                {
+                  nativeEvent: {
+                    contentOffset: {x: ScrollX},
+                  },
+                },
+              ],
+              {useNativeDriver: true},
+            )}
+          />
+        </View>
 
         <View>
-          <Text style={styles.title}>Song name</Text>
-          <Text style={styles.author}>Song autor</Text>
+          <Text style={styles.title}>{songs[songIndex].name}</Text>
+          <Text style={styles.author}>{songs[songIndex].artist}</Text>
         </View>
 
         <Slider
@@ -75,7 +117,6 @@ const Musicplayer = () => {
           }}>
           <Text style={{color: 'white'}}>0.00</Text>
           <Text style={{color: 'white'}}>3.00</Text>
-          {/* <Text style={{color:'white',backgroundColor:'red'}}>{songs[0].name}</Text> */}
         </View>
 
         <View
@@ -85,7 +126,7 @@ const Musicplayer = () => {
             justifyContent: 'space-between',
             marginTop: '7%',
           }}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={skipBack}>
             <Ionicons
               name="play-skip-back-outline"
               size={40}
@@ -96,7 +137,7 @@ const Musicplayer = () => {
           <TouchableOpacity>
             <Ionicons name="pause-circle-outline" size={60} color="#FFD369" />
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={skipNext}>
             <Ionicons
               name="play-skip-forward-outline"
               size={40}
@@ -151,7 +192,7 @@ const styles = StyleSheet.create({
   imageContainer: {
     width: 180,
     height: 180,
-    marginBottom: '10%',
+    marginBottom: '5%',
   },
   image: {
     width: '100%',

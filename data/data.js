@@ -7,15 +7,15 @@ const songs = [
   },
   {
     id: 2,
-    name: 'xxx',
+    name: 'yyy',
     image: require('../data/song.jpeg'),
-    artist: 'asdasd',
+    artist: 'asdasdasdasd',
   },
   {
     id: 3,
-    name: 'xxx',
+    name: 'zzz',
     image: require('../data/song.jpeg'),
-    artist: 'asdasd',
+    artist: 'asdasdasdasdasdasd',
   },
 ];
  export default songs
