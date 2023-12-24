@@ -33,11 +33,29 @@ const Musicplayer = () => {
   const [iconName, setIconName] = useState('play-circle');
   const playbackState = usePlaybackState();
   const progress = useProgress();
-  console.log(progress, 'progress sts');
+  const [songname, setSongName] = useState();
+  const [artistname, setArtistname] = useState();
+  const [songImage, setsongImage] = useState();
+
+  // console.log(progress, 'progress sts');
 
   const [songIndex, setsongIndex] = useState(0);
   const ScrollX = useRef(new Animated.Value(0)).current;
   const songslider = useRef(null);
+
+  useTrackPlayerEvents([Event.PlaybackActiveTrackChanged], async event => {
+    // console.log(event,"events sts")
+    // console.log(Event,"checking")
+    if (event.type === Event.PlaybackActiveTrackChanged) {
+      const currentTrack = await TrackPlayer.getActiveTrackIndex();
+      const track = await TrackPlayer.getTrack(currentTrack);
+      const {title, artist, artwork} = track;
+      console.log(artwork, 'imagedetails');
+      setsongImage(artwork);
+      setSongName(title);
+      setArtistname(artist);
+    }
+  });
 
   const issetup = async () => {
     console.log('starting');
@@ -64,8 +82,8 @@ const Musicplayer = () => {
     if (currentTrack == null) {
       await setup();
     } else {
-      console.log(playbackState.state, 'hello');
-      TrackPlayer.setRepeatMode(RepeatMode.Track);
+      // console.log(playbackState.state, 'hello');
+      // TrackPlayer.setRepeatMode(RepeatMode.Track);
       // console.log(State, 'checking sts');
 
       if (playbackState.state === State.Playing) {
@@ -122,7 +140,10 @@ const Musicplayer = () => {
           width: width,
         }}>
         <View style={styles.imageContainer}>
-          <Image source={item.image} style={styles.image} />
+          <Image
+            source={songImage ? {uri: songImage} : require('../data/song.jpeg')}
+            style={styles.image}
+          />
         </View>
       </Animated.View>
     );
@@ -154,8 +175,10 @@ const Musicplayer = () => {
         </View>
 
         <View>
-          <Text style={styles.title}>{songs[songIndex].name}</Text>
-          <Text style={styles.author}>{songs[songIndex].artist}</Text>
+          <Text style={styles.title}>{songname ? songname : 'Unknown'}</Text>
+          <Text style={styles.author}>
+            {artistname ? artistname : 'Unknown'}
+          </Text>
         </View>
 
         <Slider
