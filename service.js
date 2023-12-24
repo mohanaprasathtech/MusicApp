@@ -2,7 +2,6 @@ import TrackPlayer, {Event, RepeatMode} from 'react-native-track-player';
 import songs from './data/data';
 
 export async function setupPlayer() {
-  console.log('coming');
   issetup = false;
   try {
     await TrackPlayer.getActiveTrackIndex();
@@ -16,9 +15,8 @@ export async function setupPlayer() {
 }
 
 export const addTrack = async () => {
-  console.log('tracking');
   await TrackPlayer.add(songs);
-  // await TrackPlayer.setRepeatMode(RepeatMode.Queue)
+  await TrackPlayer.setRepeatMode(RepeatMode.Off)
 };
 
 export async function playbackService() {

@@ -2,23 +2,23 @@ import {Track} from 'react-native-track-player';
 const songs: Track[] = [
   {
     id: 1,
-    name: 'xxx',
-    image: require('../data/song.jpeg'),
-    artist: 'asdasd',
+    name: 'BadAss',
+    image: require('../data/badass.jpeg'),
+    artist: 'Anirudh Ravichander',
     url: require('../data/songs/Badass.mp3'),
   },
   {
     id: 2,
-    name: 'yyy',
-    image: require('../data/song.jpeg'),
-    artist: 'asdasdasdasd',
+    name: 'Bloody Sweet',
+    image: require('../data/bloody.jpeg'),
+    artist: 'Anirudh Ravichander',
     url: require('../data/songs/Bloody.mp3'),
   },
   {
     id: 3,
-    name: 'zzz',
-    image: require('../data/song.jpeg'),
-    artist: 'asdasdasdasdasdasd',
+    name: 'Na Ready',
+    image: require('../data/ready.jpeg'),
+    artist: 'Vijay',
     url: require('../data/songs/Ready.mp3'),
   },
 ];

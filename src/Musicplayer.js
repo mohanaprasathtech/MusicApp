@@ -28,68 +28,45 @@ import {addTrack, setupPlayer} from '../service';
 
 const {width, height} = Dimensions.get('window');
 
-// const setupPlayer = async () => {
-//   issetup=false;
-
-//   try {
-//     await TrackPlayer.getActiveTrackIndex()
-//   } catch (error) {
-//     await TrackPlayer.setupPlayer();
-//   }finally{
-//     return issetup
-//   } await TrackPlayer.add(songs);
-
-// };
-
-// const togglePause = async playingstate => {
-//   const currentstate = await TrackPlayer.getActiveTrack();
-//   if (currentstate !== null) {
-//     if (playingstate == State.Paused) {
-//       await TrackPlayer.play();
-//     } else {
-//       await TrackPlayer.pause();
-//     }
-//   }
-// };
-
 const Musicplayer = () => {
   const [isplayer, setisplayer] = useState(false);
   const [iconName, setIconName] = useState('play-circle');
-  // const playingstate = usePlaybackState();
   const playbackState = usePlaybackState();
+  const progress = useProgress();
+  console.log(progress, 'progress sts');
+
   const [songIndex, setsongIndex] = useState(0);
   const ScrollX = useRef(new Animated.Value(0)).current;
   const songslider = useRef(null);
 
   const issetup = async () => {
     console.log('starting');
-    let setup= await setupPlayer();
+    let setup = await setupPlayer();
 
     if (setup) {
       await addTrack();
     }
-    setisplayer(setup)
+    // setisplayer(setup); check !ok
     // try {
     //   await TrackPlayer.setupPlayer();
     //   await TrackPlayer.reset();
     // } catch (error) {
     //   console.log(error,"crashed")
     // }
-  
-
     // await TrackPlayer.add(songs);
   };
 
   async function togglePlayback() {
     const currentTrack = await TrackPlayer.getActiveTrackIndex();
-    // console.log(TrackPlayer.getActiveTrackIndex(),"TrackPlayer.getActiveTrackIndex()")
-    console.log(currentTrack, 'currentTrack check');
-    console.log(TrackPlayer,'all details')
+    // console.log(currentTrack, 'currentTrack check');
+    // console.log(TrackPlayer, 'all details');
+
     if (currentTrack == null) {
       await setup();
     } else {
-      console.log(playbackState.state,"hello");
-      console.log(State.Playing,"checking sts");
+      console.log(playbackState.state, 'hello');
+      TrackPlayer.setRepeatMode(RepeatMode.Track);
+      // console.log(State, 'checking sts');
 
       if (playbackState.state === State.Playing) {
         await TrackPlayer.pause();
@@ -101,10 +78,19 @@ const Musicplayer = () => {
     }
   }
 
+  const Nextsong = async () => {
+    await TrackPlayer.skipToNext();
+  };
+  const prevSong = async () => {
+    await TrackPlayer.skipToPrevious();
+  };
+
   useEffect(() => {
     issetup();
+
     ScrollX.addListener(({value}) => {
       let indexvalue = Math.round(value / width);
+      console.log(indexvalue, 'songindex');
       setsongIndex(indexvalue);
     });
 
@@ -113,15 +99,19 @@ const Musicplayer = () => {
     };
   }, []);
 
-  const skipNext = () => {
+  const skipNext = async () => {
     songslider.current.scrollToOffset({
       offset: (songIndex + 1) * width,
     });
+
+    await Nextsong();
   };
-  const skipBack = () => {
+  const skipBack = async () => {
     songslider.current.scrollToOffset({
       offset: (songIndex - 1) * width,
     });
+
+    await prevSong();
   };
   const SongList = (item, index) => {
     return (
@@ -175,13 +165,15 @@ const Musicplayer = () => {
             marginTop: '10%',
             flexDirection: 'row',
           }}
-          value={10}
+          value={progress.position}
           minimumValue={0}
-          maximumValue={100}
+          maximumValue={progress.duration}
           thumbTintColor="#FFD369"
           minimumTrackTintColor="#FFD369"
           maximumTrackTintColor="#FFF"
-          onSlidingComplete={() => {}}
+          onSlidingComplete={async value => {
+            await TrackPlayer.seekTo(value);
+          }}
         />
 
         <View
@@ -190,8 +182,14 @@ const Musicplayer = () => {
             justifyContent: 'space-between',
             width: 300,
           }}>
-          <Text style={{color: 'white'}}>0.00</Text>
-          <Text style={{color: 'white'}}>3.00</Text>
+          <Text style={{color: 'white'}}>
+            {new Date(progress.position * 1000).toISOString().substr(14, 5)}
+          </Text>
+          <Text style={{color: 'white'}}>
+            {new Date((progress.duration - progress.position) * 1000)
+              .toISOString()
+              .substr(14, 5)}
+          </Text>
         </View>
 
         <View
@@ -210,14 +208,7 @@ const Musicplayer = () => {
             />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => togglePlayback()}>
-            <Ionicons
-              // name={playingstate ? 'pause-circle-outline' : 'playcircleo'}
-              // name='play-outline'
-              name={iconName}
-              size={60}
-              color="#FFD369"
-              // pressEvent={togglePlayback}
-            />
+            <Ionicons name={iconName} size={60} color="#FFD369" />
           </TouchableOpacity>
           <TouchableOpacity onPress={skipNext}>
             <Ionicons
@@ -234,9 +225,6 @@ const Musicplayer = () => {
         <View style={styles.Iconstyles}>
           <TouchableOpacity>
             <AntDesign name="hearto" size={30} color="white" />
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Ionicons name="repeat" size={30} color="white" />
           </TouchableOpacity>
           <TouchableOpacity>
             <AntDesign name="sharealt" size={30} color="white" />
