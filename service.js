@@ -16,7 +16,6 @@ export async function setupPlayer() {
 
 export const addTrack = async () => {
   await TrackPlayer.add(songs);
-  // await TrackPlayer.setRepeatMode(RepeatMode.Off)
 };
 
 export async function playbackService() {

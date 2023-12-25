@@ -63,7 +63,15 @@ const Musicplayer = () => {
 
     if (setup) {
       await addTrack();
+      TrackPlayer.updateOptions({
+        capabilities: [
+          Capability.Play,
+          Capability.Pause,
+          Capability.SkipToNext,
+        ],
+      });
     }
+    
     // setisplayer(setup); check !ok
     // try {
     //   await TrackPlayer.setupPlayer();
